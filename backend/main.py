@@ -202,3 +202,7 @@ def _to_data_url(arr: np.ndarray) -> str:
     import base64
     encoded = base64.b64encode(buf.getvalue()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
+
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
