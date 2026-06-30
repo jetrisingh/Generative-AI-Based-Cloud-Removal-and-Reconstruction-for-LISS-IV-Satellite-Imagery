@@ -1,0 +1,51 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+
+# ===== Virtual environment =====
+venv/
+env/
+ENV/
+.venv/
+
+# ===== Model weights (large files -- don't push to GitHub) =====
+backend/weights/*.pth
+backend/weights/*.pt
+backend/weights/*.ckpt
+backend/weights/*.onnx
+backend/weights/*.h5
+!backend/weights/.gitkeep
+
+# ===== Environment / secrets =====
+.env
+.env.local
+*.env
+
+# ===== Logs =====
+*.log
+nohup.out
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Editor / IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== Temp / cache =====
+*.tmp
+.cache/
+
+# ===== Test/demo output =====
+backend/outputs/
+*.tif
+*.tiff
+!frontend/assets/presets/*.jpg
+!frontend/assets/presets/*.png

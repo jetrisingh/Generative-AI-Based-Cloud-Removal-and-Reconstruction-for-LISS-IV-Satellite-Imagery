@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ISRO · CRR — LISS-IV Cloud Removal & Reconstruction</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">⟁</div>
+    <div class="brand-text">
+      <div class="brand-title">ISRO · CRR</div>
+      <div class="brand-sub">LISS-IV PIPELINE</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="#demo">DEMO</a>
+    <a href="#output">OUTPUT</a>
+    <a href="#pipeline">PIPELINE</a>
+  </nav>
+  <a class="gov-link" href="https://isro.gov.in" target="_blank" rel="noopener">ISRO.GOV.IN ↗</a>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="status-pill"><span class="dot"></span> ISRO HACKATHON · MISSION CONTROL</div>
+  <h1 class="hero-title">
+    CLOUD REMOVAL<br/>
+    <span class="weak">&amp;</span> RECONSTRUCTION<br/>
+    <span class="accent">FOR LISS-IV</span> IMAGERY
+  </h1>
+  <p class="hero-desc">
+    A generative AI pipeline that recovers occluded ground from cloudy satellite
+    captures and reconstructs the underlying terrain at LISS-IV fidelity.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">SENSOR</div>
+      <div class="stat-value">LISS-IV</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">BANDS</div>
+      <div class="stat-value">R/G/NIR</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">GSD</div>
+      <div class="stat-value">5.8 m</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">STATUS</div>
+      <div class="stat-value" id="api-status">CHECKING…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO / UPLOAD ============ -->
+<section class="section" id="demo">
+  <div class="section-grid">
+    <div class="section-copy">
+      <div class="eyebrow">01 | INPUT</div>
+      <h2>UPLOAD A CLOUDY CAPTURE</h2>
+      <p>
+        Drop a satellite tile in TIFF, PNG, or JPG format. The pipeline will
+        estimate cloud coverage, remove occlusions, then reconstruct the
+        underlying surface with enhanced contrast and detail.
+      </p>
+      <div class="chip-grid">
+        <div class="chip">⇪ TIFF · PNG · JPG</div>
+        <div class="chip">▦ MAX 25 MB</div>
+        <div class="chip">≡ 3 STAGE PIPELINE</div>
+        <div class="chip">∿ SHARPNESS METRIC</div>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="file-input" accept=".tif,.tiff,.png,.jpg,.jpeg" hidden />
+      <div class="dz-icon">⤒</div>
+      <div class="dz-title">DRAG &amp; DROP SATELLITE TILE</div>
+      <div class="dz-sub">TIFF · PNG · JPG · MAX 25MB</div>
+      <button class="btn-primary" id="select-file-btn">⌬ SELECT FILE</button>
+    </div>
+  </div>
+
+  <div class="presets-row">
+    <div class="presets-label">// OR · QUICK DEMO PRESETS</div>
+    <div class="presets-grid" id="presets-grid">
+      <!-- populated by app.js -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ OUTPUT ============ -->
+<section class="section" id="output">
+  <div class="eyebrow">02 | PIPELINE OUTPUT</div>
+  <h2>BEFORE · AFTER · RECONSTRUCTED</h2>
+
+  <div class="output-grid">
+    <div class="output-col">
+      <div class="output-head"><span class="ico">▣</span> 01 · ORIGINAL</div>
+      <div class="output-canvas" id="panel-original">
+        <div class="placeholder-text" id="ph-original">AWAITING INPUT<br/><span class="dim">AWAITING DATA STREAM</span></div>
+        <img id="img-original" hidden />
+      </div>
+    </div>
+    <div class="output-col">
+      <div class="output-head"><span class="ico">⦸</span> 02 · CLOUD REMOVED</div>
+      <div class="output-canvas" id="panel-cloud">
+        <div class="placeholder-text" id="ph-cloud">DEHAZING PENDING<br/><span class="dim">AWAITING DATA STREAM</span></div>
+        <img id="img-cloud" hidden />
+      </div>
+    </div>
+    <div class="output-col">
+      <div class="output-head"><span class="ico">✦</span> 03 · RECONSTRUCTED</div>
+      <div class="output-canvas" id="panel-recon">
+        <div class="placeholder-text" id="ph-recon">RECONSTRUCTION PENDING<br/><span class="dim">AWAITING DATA STREAM</span></div>
+        <img id="img-recon" hidden />
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics-row" id="metrics-row" hidden>
+    <div class="metric"><div class="metric-label">CLOUD COVERAGE</div><div class="metric-value" id="m-cloud">—</div></div>
+    <div class="metric"><div class="metric-label">SHARPNESS GAIN</div><div class="metric-value" id="m-sharp">—</div></div>
+    <div class="metric"><div class="metric-label">PSNR (EST.)</div><div class="metric-value" id="m-psnr">—</div></div>
+    <div class="metric"><div class="metric-label">INFERENCE TIME</div><div class="metric-value" id="m-time">—</div></div>
+  </div>
+</section>
+
+<!-- ============ PIPELINE ============ -->
+<section class="section" id="pipeline">
+  <div class="eyebrow">03 | THE PIPELINE</div>
+  <h2>THREE STAGE PROCESS</h2>
+  <div class="pipeline-grid">
+    <div class="pipe-card">
+      <div class="pipe-num">01</div>
+      <div class="pipe-title">CLOUD DETECTION</div>
+      <div class="pipe-desc">Segmentation network estimates per-pixel cloud probability across R/G/NIR bands.</div>
+    </div>
+    <div class="pipe-card">
+      <div class="pipe-num">02</div>
+      <div class="pipe-title">OCCLUSION REMOVAL</div>
+      <div class="pipe-desc">Detected cloud mask is used to inpaint a clean intermediate base image.</div>
+    </div>
+    <div class="pipe-card">
+      <div class="pipe-num">03</div>
+      <div class="pipe-title">GENERATIVE RECONSTRUCTION</div>
+      <div class="pipe-desc">A generative model reconstructs fine surface detail at LISS-IV fidelity.</div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  Built for ISRO Hackathon — Generative AI Cloud Removal &amp; Reconstruction for LISS-IV Imagery.
+</footer>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
